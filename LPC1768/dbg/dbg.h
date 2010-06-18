@@ -39,21 +39,26 @@ class DebugStream
 public:
 static void debug(const char* format, ...);
 static void release();
+static void breakPoint(const char* file, int line);
 private:
 
 };
 
 #undef DBG
 #undef DBG_END
+#undef BREAK
 #define DBG DebugStream::debug
 #define DBG_END DebugStream::release
+#define BREAK() DebugStream::breakPoint(__FILE__, __LINE__)
 #endif
 
 #else
 #undef DBG
 #undef DBG_END
+#undef BREAK
 #define DBG(...)
 #define DBG_END()
+#define BREAK()
 #endif
 
 #ifdef __LWIP_DEBUG
