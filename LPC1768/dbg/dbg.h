@@ -47,7 +47,7 @@ private:
 #undef DBG
 #undef DBG_END
 #undef BREAK
-#define DBG DebugStream::debug
+#define DBG(...) do{ DebugStream::debug("[%s:%s@%d] ", __FILE__, __FUNCTION__, __LINE__); DebugStream::debug(__VA_ARGS__); } while(0);
 #define DBG_END DebugStream::release
 #define BREAK() DebugStream::breakPoint(__FILE__, __LINE__)
 #endif
