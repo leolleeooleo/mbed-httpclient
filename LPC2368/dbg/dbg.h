@@ -21,12 +21,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/** \file
+Debugging helpers header file
+*/
+
 //#ifdef DBG_H
 //#define DBG_H
 
 #ifdef __LWIP_DEBUG
 #define __DEBUG
 #endif
+
+/*!
+  \def __DEBUG
+  To define to enable debugging in one file
+*/
 
 #ifdef __DEBUG
 
@@ -47,8 +56,15 @@ private:
 #undef DBG
 #undef DBG_END
 #undef BREAK
+
+///Debug output (if enabled), same syntax as printf, with heading info
 #define DBG(...) do{ DebugStream::debug("[%s:%s@%d] ", __FILE__, __FUNCTION__, __LINE__); DebugStream::debug(__VA_ARGS__); } while(0);
+
+///Debug output (if enabled), same syntax as printf, no heading info
+#define DBGL(...) do{ DebugStream::debug(__VA_ARGS__); } while(0);
 #define DBG_END DebugStream::release
+
+///Break point usin serial debug interface (if debug enbaled)
 #define BREAK() DebugStream::breakPoint(__FILE__, __LINE__)
 #endif
 

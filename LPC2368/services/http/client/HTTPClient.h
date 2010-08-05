@@ -21,12 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/** \file
+HTTP Client header file
+*/
+
 #ifndef HTTP_CLIENT_H
 #define HTTP_CLIENT_H
 
 class HTTPData;
 
-#include "if/net/net.h"
+#include "core/net.h"
 #include "api/TCPSocket.h"
 #include "api/DNSRequest.h"
 #include "HTTPData.h"
@@ -38,33 +42,68 @@ using std::string;
 #include <map>
 using std::map;
 
+///HTTP client results
 enum HTTPResult
 {
-  HTTP_OK,
-  HTTP_PROCESSING,
-  HTTP_PARSE, //URI Parse error
-  HTTP_DNS, //Could not resolve name
-  HTTP_PRTCL, //Protocol error
-  HTTP_NOTFOUND, //404 Error
-  HTTP_REFUSED, //403 Error
-  HTTP_ERROR, //xxx error
-  HTTP_TIMEOUT, //Connection timeout
-  HTTP_CONN //Connection error
+  HTTP_OK, ///<Success
+  HTTP_PROCESSING, ///<Processing
+  HTTP_PARSE, ///<URI Parse error
+  HTTP_DNS, ///<Could not resolve name
+  HTTP_PRTCL, ///<Protocol error
+  HTTP_NOTFOUND, ///<HTTP 404 Error
+  HTTP_REFUSED, ///<HTTP 403 Error
+  HTTP_ERROR, ///<HTTP xxx error
+  HTTP_TIMEOUT, ///<Connection timeout
+  HTTP_CONN ///<Connection error
 };
 
+#include "core/netservice.h"
 
-
+///A simple HTTP Client
+/**
+The HTTPClient is composed of:
+- The actual client (HTTPClient)
+- Classes that act as a data repository, each of which deriving from the HTTPData class (HTTPText for short text content, HTTPFile for file I/O, HTTPMap for key/value pairs, and HTTPStream for streaming purposes)
+*/
 class HTTPClient : protected NetService
 {
 public:
+  ///Instantiates the HTTP client
   HTTPClient();
   virtual ~HTTPClient();
   
+  ///Provides a basic authentification feature (Base64 encoded username and password)
   void basicAuth(const char* user, const char* password); //Basic Authentification
   
   //High Level setup functions
+  ///Executes a GET Request (blocking)
+  /**
+  Executes a GET request on the URI uri
+  @param uri : URI on which to execute the request
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  Blocks until completion
+  */
   HTTPResult get(const char* uri, HTTPData* pDataIn); //Blocking
+  
+  ///Executes a GET Request (non blocking)
+  /**
+  Executes a GET request on the URI uri
+  @param uri : URI on which to execute the request
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  @param pMethod : callback function
+  The function returns immediately and calls the callback on completion or error
+  */
   HTTPResult get(const char* uri, HTTPData* pDataIn, void (*pMethod)(HTTPResult)); //Non blocking
+  
+  ///Executes a GET Request (non blocking)
+  /**
+  Executes a GET request on the URI uri
+  @param uri : URI on which to execute the request
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  @param pItem : instance of class on which to execute the callback method
+  @param pMethod : callback method
+  The function returns immediately and calls the callback on completion or error
+  */
   template<class T> 
   HTTPResult get(const char* uri, HTTPData* pDataIn, T* pItem, void (T::*pMethod)(HTTPResult)) //Non blocking
   {
@@ -73,8 +112,37 @@ public:
     return HTTP_PROCESSING;
   }
   
+  ///Executes a POST Request (blocking)
+  /**
+  Executes a POST request on the URI uri
+  @param uri : URI on which to execute the request
+  @param dataOut : a HTTPData instance that contains the data that will be posted
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  Blocks until completion
+  */
   HTTPResult post(const char* uri, const HTTPData& dataOut, HTTPData* pDataIn); //Blocking
+  
+  ///Executes a POST Request (non blocking)
+  /**
+  Executes a POST request on the URI uri
+  @param uri : URI on which to execute the request
+  @param dataOut : a HTTPData instance that contains the data that will be posted
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  @param pMethod : callback function
+  The function returns immediately and calls the callback on completion or error
+  */
   HTTPResult post(const char* uri, const HTTPData& dataOut, HTTPData* pDataIn, void (*pMethod)(HTTPResult)); //Non blocking
+  
+  ///Executes a POST Request (non blocking)
+  /**
+  Executes a POST request on the URI uri
+  @param uri : URI on which to execute the request
+  @param dataOut : a HTTPData instance that contains the data that will be posted
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  @param pItem : instance of class on which to execute the callback method
+  @param pMethod : callback method
+  The function returns immediately and calls the callback on completion or error
+  */
   template<class T> 
   HTTPResult post(const char* uri, const HTTPData& dataOut, HTTPData* pDataIn, T* pItem, void (T::*pMethod)(HTTPResult)) //Non blocking  
   {
@@ -82,28 +150,68 @@ public:
     doPost(uri, dataOut, pDataIn);
     return HTTP_PROCESSING;
   }
-  
+
+  ///Executes a GET Request (non blocking)
+  /**
+  Executes a GET request on the URI uri
+  @param uri : URI on which to execute the request
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  The function returns immediately and calls the previously set callback on completion or error
+  */  
   void doGet(const char* uri, HTTPData* pDataIn);  
+  
+  ///Executes a POST Request (non blocking)
+  /**
+  Executes a POST request on the URI uri
+  @param uri : URI on which to execute the request
+  @param dataOut : a HTTPData instance that contains the data that will be posted
+  @param pDataIn : pointer to an HTTPData instance that will collect the data returned by the request, can be NULL
+  @param pMethod : callback function
+  The function returns immediately and calls the previously set callback on completion or error
+  */
   void doPost(const char* uri, const HTTPData& dataOut, HTTPData* pDataIn); 
   
+  ///Setups the result callback
+  /**
+  @param pMethod : callback function
+  */
   void setOnResult( void (*pMethod)(HTTPResult) );
+  
+  ///Setups the result callback
+  /**
+  @param pItem : instance of class on which to execute the callback method
+  @param pMethod : callback method
+  */
   class CDummy;
   template<class T> 
-  //Linker bug : Must be defined here :(
   void setOnResult( T* pItem, void (T::*pMethod)(HTTPResult) )
   {
     m_pCb = NULL;
     m_pCbItem = (CDummy*) pItem;
     m_pCbMeth = (void (CDummy::*)(HTTPResult)) pMethod;
   }
-  
+
+  ///Setups timeout
+  /**
+  @param ms : time of connection inactivity in ms after which the request should timeout
+  */
   void setTimeout(int ms);
   
   virtual void poll(); //Called by NetServices
   
+  ///Gets last request's HTTP response code
+  /**
+  @return The HTTP response code of the last request
+  */
   int getHTTPResponseCode();
+  
+  ///Sets a specific request header
   void setRequestHeader(const string& header, const string& value);
+  
+  ///Gets a response header
   string& getResponseHeader(const string& header);
+  
+  ///Clears request headers
   void resetRequestHeaders();
   
 protected:

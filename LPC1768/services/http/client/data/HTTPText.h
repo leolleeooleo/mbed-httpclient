@@ -21,6 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/** \file
+HTTP Text data source/sink header file
+*/
+
 #ifndef HTTP_TEXT_H
 #define HTTP_TEXT_H
 
@@ -29,18 +33,50 @@ THE SOFTWARE.
 
 #define DEFAULT_MAX_MEM_ALLOC 512 //Avoid out-of-memory problems
 
+///HTTP Client data container for text
+/**
+This is a simple "Text" data repository for HTTP requests.
+*/
 class HTTPText : public HTTPData //Simple Text I/O
 {
 public:
+  ///Instantiates the object.
+  /**
+  @param encoding encoding of the data, it defaults to text/html.
+  @param maxSize defines the maximum memory size that can be allocated by the object. It defaults to 512 bytes.
+  */
   HTTPText(const string& encoding = "text/html", int maxSize = DEFAULT_MAX_MEM_ALLOC);
   virtual ~HTTPText();
   
+  ///Gets text
+  /**
+  Returns the text in the container as a zero-terminated char*.
+  The array returned points to the internal buffer of the object and remains owned by the object.
+  */
   const char* gets() const;
+  
+  //Puts text
+  /**
+  Sets the text in the container using a zero-terminated char*.
+  */
   void puts(const char* str);
   
+  ///Gets text
+  /**
+  Returns the text in the container as string.
+  */
   string& get();
+  
+  ///Puts text
+  /**
+  Sets the text in the container as string.
+  */
   void set(const string& str);
   
+  ///Clears the content.
+  /**
+  If this container is used as a data sink, it is cleared by the HTTP Client at the beginning of the request.
+  */
   virtual void clear();
   
 protected:

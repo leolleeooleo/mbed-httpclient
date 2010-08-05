@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef URL_H
 #define URL_H
 
-#include "if/net/ipaddr.h"
+#include "core/ipaddr.h"
 
 #include <string>
 using std::string;
