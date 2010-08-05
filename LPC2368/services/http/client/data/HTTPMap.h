@@ -21,6 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/** \file
+HTTP Map data source/sink header file
+*/
+
 #ifndef HTTP_MAP_H
 #define HTTP_MAP_H
 
@@ -32,15 +36,29 @@ using std::map;
 
 typedef map<string, string> Dictionary;
 
+///HTTP Client data container for key/value pairs
+/**
+This class simplifies the use of key/value pairs requests and responses used widely among web APIs.
+Note that HTTPMap inherits from std::map<std::string,std::string>.
+You can therefore use any public method of that class, including the square brackets operator ( [ ] ) to access a value.
+
+The data is encoded or decoded to/from a key/value pairs-formatted string, after url-encoding/decoding.
+*/
 class HTTPMap : public HTTPData, public Dictionary //Key/Value pairs
 {
 public:
+  ///Instantiates map
+  /**
+  @param keyValueSep Key/Value separator (defaults to "=")
+  @param pairSep Pairs separator (defaults to "&")
+  */
   HTTPMap(const string& keyValueSep = "=", const string& pairSep = "&");
   virtual ~HTTPMap();
   
  /* string& operator[](const string& key);
   int count();*/
 
+  ///Clears the content
   virtual void clear();  
   
 protected:

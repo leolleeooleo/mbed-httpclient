@@ -27,18 +27,36 @@ THE SOFTWARE.
 #include "../HTTPData.h"
 #include "mbed.h"
 
+/** \file
+HTTP Stream data source/sink header file
+*/
+
 typedef uint8_t byte;
 
+///HTTP Client Streaming tool
+/**
+This class allows you to stream data from the web using a persisting HTTP connection.
+To use it properly you must use a non-blocking HTTPClient method.
+*/
 class HTTPStream : public HTTPData //Streaming buf
 {
 public:
+  ///Instantiates the object
   HTTPStream();
   virtual ~HTTPStream();
   
+  ///Starts to read into buffer
+  /**
+  Passes a buffer of address @a buf and size @a size to the instance.
+  When it receives data it will be stored in this buffer.
+  When the buffer is full it throttles the client until this function is called again.
+  */
   void readNext(byte* buf, int size);
   
+  ///Returns whether there is data available to read
   bool readable();
   
+  ///Returns the actual length of the payload written in the buffer
   int readLen();
   
   virtual void clear();

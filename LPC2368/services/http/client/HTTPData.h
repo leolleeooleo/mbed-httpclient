@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef HTTP_DATA_H
 #define HTTP_DATA_H
 
-#include "if/net/net.h"
+#include "core/net.h"
 
 #include <string>
 using std::string;
