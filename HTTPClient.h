@@ -52,8 +52,7 @@ enum HTTPResult
   HTTP_CONN ///<Connection error
 };
 
-///A simple HTTP Client
-/**
+/**A simple HTTP Client
 The HTTPClient is composed of:
 - The actual client (HTTPClient)
 - Classes that act as a data repository, each of which deriving from the HTTPData class (HTTPText for short text content, HTTPFile for file I/O, HTTPMap for key/value pairs, and HTTPStream for streaming purposes)
@@ -61,7 +60,7 @@ The HTTPClient is composed of:
 class HTTPClient
 {
 public:
-  ///Instantiates the HTTP client
+  ///Instantiate the HTTP client
   HTTPClient();
   ~HTTPClient();
   
@@ -76,43 +75,37 @@ public:
 #endif
   
   //High Level setup functions
-  ///Executes a GET Request (blocking)
-  /**
-  Executes a GET request on the url url
+  /** Execute a GET request on the url
+  Blocks until completion
   @param url : url on which to execute the request
   @param pDataIn : pointer to an IHTTPDataIn instance that will collect the data returned by the request, can be NULL
   @param timeout waiting timeout in ms (osWaitForever for blocking function, not recommended)
-  @return 0 on success, NET error on failure
-  Blocks until completion
+  @return 0 on success, NET error (<0) on failure
   */
   int get(const char* url, IHTTPDataIn* pDataIn, uint32_t timeout = HTTP_CLIENT_DEFAULT_TIMEOUT); //Blocking
   
-  ///Executes a GET Request (blocking)
-  /**
-  Executes a GET request on the url url
+  /** Execute a GET request on the url
+  Blocks until completion
+  This is a helper to directly get a piece of text from a HTTP result
   @param url : url on which to execute the request
   @param result : pointer to a char array in which the result will be stored
   @param maxResultLen : length of the char array (including space for the NULL-terminating char)
   @param timeout waiting timeout in ms (osWaitForever for blocking function, not recommended)
   @return 0 on success, NET error on failure
-  Blocks until completion
   */
   int get(const char* url, char* result, size_t maxResultLen, uint32_t timeout = HTTP_CLIENT_DEFAULT_TIMEOUT); //Blocking
 
-  ///Executes a POST Request (blocking)
-  /**
-  Executes a POST request on the url url
+  /** Execute a POST request on the url
+  Blocks until completion
   @param url : url on which to execute the request
   @param dataOut : a IHTTPDataOut instance that contains the data that will be posted
   @param pDataIn : pointer to an IHTTPDataIn instance that will collect the data returned by the request, can be NULL
   @param timeout waiting timeout in ms (osWaitForever for blocking function, not recommended)
   @return 0 on success, NET error on failure
-  Blocks until completion
   */
   int post(const char* url, const IHTTPDataOut& dataOut, IHTTPDataIn* pDataIn, uint32_t timeout = HTTP_CLIENT_DEFAULT_TIMEOUT); //Blocking
   
-  ///Gets last request's HTTP response code
-  /**
+  /** Get last request's HTTP response code
   @return The HTTP response code of the last request
   */
   int getHTTPResponseCode();
@@ -136,10 +129,6 @@ private:
 
   const char* m_basicAuthUser;
   const char* m_basicAuthPassword;
-/*
-  HTTPData* m_pDataOut;
-  HTTPData* m_pDataIn;
-*/
   int m_httpResponseCode;
 
   struct sockaddr_in m_serverAddr;

@@ -29,6 +29,9 @@ SOFTWARE.
 
 #define HTTPMAP_TABLE_SIZE 32
 
+/** Map of key/value pairs
+ * Used to transmit POST data using the application/x-www-form-urlencoded encoding
+ */
 class HTTPMap: public IHTTPDataOut
 {
 public:
